@@ -1,0 +1,23 @@
+type Query {
+    countries: [Country]
+}
+
+type Country {
+    name: String
+    population: Int
+    area: Int
+    capital: City
+}
+
+type City {
+    name: String
+    population: Int
+    geoLocation: GeoCoord
+    elevation: Int
+    province: String
+}
+
+type GeoCoord {
+    latitude: Float
+    longitude: Float
+}
