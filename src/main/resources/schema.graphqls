@@ -7,6 +7,7 @@ type Country {
     population: Int
     area: Int
     capital: City
+    provinces: [Province]
 }
 
 type City {
@@ -14,7 +15,13 @@ type City {
     population: Int
     geoLocation: GeoCoord
     elevation: Int
-    province: String
+    province: Province
+}
+
+type Province {
+    name: String
+    population: Int
+    capital: City
 }
 
 type GeoCoord {
