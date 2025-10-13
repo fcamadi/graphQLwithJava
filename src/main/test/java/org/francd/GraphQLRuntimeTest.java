@@ -5,6 +5,8 @@ import graphql.validation.ValidationError;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,6 +42,7 @@ class GraphQLRuntimeTest {
         assertThat(result.getErrors()).isEmpty();
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void validQueryProvince() {
         // Given
@@ -64,6 +67,14 @@ class GraphQLRuntimeTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.getErrors()).isEmpty();
+
+        var output = result.toSpecification();  //it returns Map<String,Object>
+        assertThat(output).isNotNull();
+        var data = (Map<String,Object>)output.get("data");
+        assertThat(data).isNotNull();
+        assertThat(data).containsKey("countries").extracting("countries").isInstanceOf(List.class);
+        var countries = (List<Map<String,Object>>)data.get("countries");
+        assertThat(countries).hasSize(4);
     }
 
     @Test
