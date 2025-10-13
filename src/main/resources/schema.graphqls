@@ -3,8 +3,8 @@ type Query {
 }
 
 type Country {
-    id: ID!
-    name: String
+    code: ID!
+    name: String!
     population: Int
     area: Int
     capital: City
