@@ -31,6 +31,10 @@ class GraphQLRuntimeTest {
                     capital {
                         name
                         population
+                        province {
+                            name
+                            population
+                        }
                     }
                 }
             }
@@ -57,7 +61,11 @@ class GraphQLRuntimeTest {
                 "population", 8670300,
                 "capital", Map.of(
                         "name", "Bern",
-                        "population", 134794))
+                        "population", 134794,
+                        "province", Map.of(
+                                "name", "Bern",
+                                "population", 1043132)
+                ))
         );
     }
 
