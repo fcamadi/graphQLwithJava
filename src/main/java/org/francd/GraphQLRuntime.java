@@ -9,7 +9,6 @@ import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import org.francd.fetchers.StaticCityDataFetcher;
 import org.francd.fetchers.StaticCountriesDataFetcher;
-import org.francd.fetchers.StaticProvinceDataFetcher;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +23,7 @@ public class GraphQLRuntime {
     public GraphQLRuntime() throws IOException {
         // The SchemaGenerator is responsible for turning a type registry and wiring into an executable GraphQLSchema
         SchemaGenerator schemaGenerator = new SchemaGenerator();
-        // buildTypeDefinitionRegistry() (implementation not shown) reads the SDL files (e.g., *.graphqls) and
+        // buildTypeDefinitionRegistry() reads the SDL files (e.g., *.graphqls) and
         // registers all object types, enums, inputs, etc., in a TypeDefinitionRegistry.
         TypeDefinitionRegistry typeRegistry = buildTypeDefinitionRegistry();
         // buildRuntimeWiring() maps each field in the schema to a DataFetcher – the Java code
@@ -50,7 +49,7 @@ public class GraphQLRuntime {
     private RuntimeWiring buildRuntimeWiring() {
         return RuntimeWiring.newRuntimeWiring()
                 .type("Query", builder -> builder.dataFetcher("countries", new StaticCountriesDataFetcher()))
-                .type("Country", builder -> builder.dataFetcher("capital", c -> null))
+                .type("Country", builder -> builder.dataFetcher("capital", new StaticCityDataFetcher()))
                 .build();
     }
 

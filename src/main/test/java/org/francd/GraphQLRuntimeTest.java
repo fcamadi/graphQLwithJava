@@ -18,6 +18,8 @@ class GraphQLRuntimeTest {
         runtime = new GraphQLRuntime();
     }
 
+
+    @SuppressWarnings("unchecked")
     @Test
     public void validQuery() {
         // Given
@@ -40,33 +42,6 @@ class GraphQLRuntimeTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.getErrors()).isEmpty();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Test
-    public void validQueryProvince() {
-        // Given
-        var query = """
-            {
-                countries {
-                    name
-                    population
-                    capital {
-                        name
-                    }
-                    provinces {
-                        name
-                    }
-                }
-            }
-        """;
-
-        // When
-        ExecutionResult result = runtime.execute(query);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getErrors()).isEmpty();
 
         //var resultData = result.getData();    //It returns directly a map with the countries
         var output = result.toSpecification();  //It returns a Map<String,Object> with 3 maps: data, errors, and extensions
@@ -76,6 +51,14 @@ class GraphQLRuntimeTest {
         assertThat(data).containsKey("countries").extracting("countries").isInstanceOf(List.class);
         var countries = (List<Map<String,Object>>)data.get("countries");
         assertThat(countries).hasSize(4);
+
+        assertThat(countries).contains(Map.of(
+                "name", "Switzerland",
+                "population", 8670300,
+                "capital", Map.of(
+                        "name", "Bern",
+                        "population", 134794))
+        );
     }
 
     @Test
