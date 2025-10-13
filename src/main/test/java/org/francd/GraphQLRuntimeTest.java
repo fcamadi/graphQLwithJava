@@ -70,7 +70,7 @@ class GraphQLRuntimeTest {
 
         //var resultData = result.getData();    //It returns directly a map with the countries
         var output = result.toSpecification();  //It returns a Map<String,Object> with 3 maps: data, errors, and extensions
-        assertThat(output).isNotNull();
+        assertThat(output).isNotNull();         //(errors and extensions when present in execution result, of course)
         var data = (Map<String,Object>)output.get("data");  //this way, we have to get first a map with name "data"
         assertThat(data).isNotNull();
         assertThat(data).containsKey("countries").extracting("countries").isInstanceOf(List.class);
