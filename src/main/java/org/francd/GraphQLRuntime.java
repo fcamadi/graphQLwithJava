@@ -7,6 +7,9 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import org.francd.fetchers.StaticCityDataFetcher;
+import org.francd.fetchers.StaticCountriesDataFetcher;
+import org.francd.fetchers.StaticProvinceDataFetcher;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +48,10 @@ public class GraphQLRuntime {
     }
 
     private RuntimeWiring buildRuntimeWiring() {
-        return RuntimeWiring.newRuntimeWiring().build();  //empty right now (no data fetchers)
+        return RuntimeWiring.newRuntimeWiring()
+                .type("Query", builder -> builder.dataFetcher("countries", new StaticCountriesDataFetcher()))
+                .type("Country", builder -> builder.dataFetcher("capital", c -> null))
+                .build();
     }
 
     public ExecutionResult execute(String query) {
