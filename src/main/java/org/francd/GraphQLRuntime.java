@@ -10,6 +10,8 @@ import graphql.schema.idl.TypeDefinitionRegistry;
 import org.francd.fetchers.StaticCityDataFetcher;
 import org.francd.fetchers.StaticCountriesDataFetcher;
 import org.francd.fetchers.StaticProvinceDataFetcher;
+import org.francd.model.City;
+import org.francd.model.Country;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,8 +52,8 @@ public class GraphQLRuntime {
     private RuntimeWiring buildRuntimeWiring() {
         return RuntimeWiring.newRuntimeWiring()
                 .type("Query", builder -> builder.dataFetcher("countries", new StaticCountriesDataFetcher()))
-                .type("Country", builder -> builder.dataFetcher("capital", new StaticCityDataFetcher()))
-                .type("City", builder -> builder.dataFetcher("province", new StaticProvinceDataFetcher()))
+                .type("Country",  builder -> builder.dataFetcher("capital", new StaticCityDataFetcher<>(Country::capital)))
+                .type("City", builder -> builder.dataFetcher("province", new StaticProvinceDataFetcher<>(City::name)))
                 .build();
     }
 
