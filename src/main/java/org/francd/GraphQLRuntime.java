@@ -1,5 +1,6 @@
 package org.francd;
 
+import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;
@@ -18,6 +19,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public class GraphQLRuntime {
 
@@ -59,7 +61,20 @@ public class GraphQLRuntime {
     }
 
     public ExecutionResult execute(String query) {
-        return graphql.execute(query);
+        return execute(query,null,null);
+    }
+
+
+    public ExecutionResult execute(String query, Map<String, Object> variables, String operationName) {
+        ExecutionInput.Builder executionInputBuilder = ExecutionInput.newExecutionInput()
+                .query(query);
+        if (variables != null) {
+            executionInputBuilder.variables(variables);
+        }
+        if (operationName != null) {
+            executionInputBuilder.operationName(operationName);
+        }
+        return graphql.execute(executionInputBuilder.build());
     }
 }
 
