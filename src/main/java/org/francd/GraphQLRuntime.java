@@ -8,8 +8,8 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
-import org.francd.fetchers.StaticCityDataFetcher;
-import org.francd.fetchers.StaticCountriesDataFetcher;
+import org.francd.fetchers.DBCityDataFetcher;
+import org.francd.fetchers.DBCountriesDataFetcher;
 import org.francd.fetchers.StaticProvinceDataFetcher;
 import org.francd.model.Country;
 import org.francd.model.Province;
@@ -19,13 +19,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
 import java.util.Map;
 
 public class GraphQLRuntime {
 
     private final GraphQL graphql;
 
-    public GraphQLRuntime() throws IOException {
+    public GraphQLRuntime(Connection dbConnection) throws IOException {
         // The SchemaGenerator is responsible for turning a type registry and wiring into an executable GraphQLSchema
         SchemaGenerator schemaGenerator = new SchemaGenerator();
         // buildTypeDefinitionRegistry() reads the SDL files (e.g., *.graphqls) and
@@ -33,7 +34,7 @@ public class GraphQLRuntime {
         TypeDefinitionRegistry typeRegistry = buildTypeDefinitionRegistry();
         // buildRuntimeWiring() maps each field in the schema to a DataFetcher – the Java code
         // that actually supplies the data when a query asks for that field.
-        RuntimeWiring wiring = buildRuntimeWiring();
+        RuntimeWiring wiring = buildRuntimeWiring(dbConnection);
         // The generator combines the type definitions with the wiring, producing a GraphQLSchema
         // that knows both the shape of the API and how to fetch data.
         GraphQLSchema schema = schemaGenerator.makeExecutableSchema(typeRegistry, wiring);
@@ -51,11 +52,11 @@ public class GraphQLRuntime {
         }
     }
 
-    private RuntimeWiring buildRuntimeWiring() {
+    private RuntimeWiring buildRuntimeWiring(Connection dbConnection) {
         return RuntimeWiring.newRuntimeWiring()
-                .type("Query", builder -> builder.dataFetcher("countries", new StaticCountriesDataFetcher()))
-                .type("Country",  builder -> builder.dataFetcher("capital", new StaticCityDataFetcher<>(Country::capital)))
-                .type("Province", builder -> builder.dataFetcher("capital", new StaticCityDataFetcher<>(Province::capital)))
+                .type("Query", builder -> builder.dataFetcher("countries", new DBCountriesDataFetcher(dbConnection)))
+                .type("Country",  builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Country::capital)))
+                .type("Province", builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Province::capital)))
                 .type("City",  builder -> builder.dataFetcher("province", new StaticProvinceDataFetcher()))
                 .build();
     }
