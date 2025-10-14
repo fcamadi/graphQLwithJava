@@ -1,5 +1,5 @@
 type Query {
-    countries: [Country]
+    countries(continent: String): [Country]
 }
 
 type Country {
