@@ -5,6 +5,9 @@ import graphql.validation.ValidationError;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -14,8 +17,16 @@ class GraphQLRuntimeTest {
 
     private final GraphQLRuntime runtime;
 
-    GraphQLRuntimeTest() throws IOException {
-        runtime = new GraphQLRuntime();
+    GraphQLRuntimeTest() throws IOException, SQLException {
+
+        // Setup DB
+        Connection dbConnection = DriverManager.getConnection(
+                "jdbc:postgresql://localhost:5432/mondial",
+                "postgres",
+                "postgres789"
+        );
+
+        runtime = new GraphQLRuntime(dbConnection);
     }
 
 
@@ -25,7 +36,7 @@ class GraphQLRuntimeTest {
         // Given
         var query = """
             {
-                countries {
+                countries(continent: "Europe") {
                     name
                     population
                     capital {
@@ -54,7 +65,7 @@ class GraphQLRuntimeTest {
         assertThat(data).isNotNull();
         assertThat(data).containsKey("countries").extracting("countries").isInstanceOf(List.class);
         var countries = (List<Map<String,Object>>)data.get("countries");
-        assertThat(countries).hasSize(4);
+        assertThat(countries).hasSize(55);
 
         assertThat(countries).contains(Map.of(
                 "name", "Switzerland",
