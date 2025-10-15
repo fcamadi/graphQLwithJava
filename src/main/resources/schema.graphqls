@@ -23,6 +23,7 @@ type Province {
     name: String!
     population: Int
     capital: City
+    area: Int
 }
 
 type GeoCoord {
