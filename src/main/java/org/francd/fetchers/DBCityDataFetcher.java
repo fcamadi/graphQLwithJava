@@ -25,10 +25,11 @@ public class DBCityDataFetcher<T> implements DataFetcher<City> {
 
     @Override
     public City get(DataFetchingEnvironment environment) throws SQLException {
-        var capitalName = cityNameExtractor.apply(environment.getSource());
 
+        var capitalName = cityNameExtractor.apply(environment.getSource());
         var statement = dbConnection.prepareStatement(CITY_SQL);
         statement.setString(1, capitalName);
+
         ResultSet result = statement.executeQuery();
         if (result.next()) {
             return Mapping.cityOf(result);

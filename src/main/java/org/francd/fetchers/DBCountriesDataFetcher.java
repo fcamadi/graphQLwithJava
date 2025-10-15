@@ -30,11 +30,10 @@ public class DBCountriesDataFetcher implements DataFetcher<List<Country>>  {
     public List<Country> get(DataFetchingEnvironment environment) throws Exception {
 
         String  continent = environment.getArgument("continent");
-
         var statement = dbConnection.prepareStatement(COUNTRY_SQL);
         statement.setString(1, continent);
-        ResultSet results = statement.executeQuery();
 
+        ResultSet results = statement.executeQuery();
         List<Country> mappedResults = new ArrayList<>();
         while (results.next()) {
             Country country = Mapping.countryOf(results);
