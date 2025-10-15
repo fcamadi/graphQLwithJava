@@ -3,6 +3,7 @@ package org.francd.db;
 import org.francd.model.City;
 import org.francd.model.Country;
 import org.francd.model.GeoCoord;
+import org.francd.model.Province;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -33,6 +34,15 @@ public class Mapping {
                 geoCoord,
                 result.getInt("elevation"),
                 result.getString("province")
+        );
+    }
+
+    public static Province provinceOf(ResultSet result) throws SQLException {
+        return new Province(
+                result.getString("name"),
+                result.getInt("population"),
+                result.getString("capital"),
+                result.getInt("area")
         );
     }
 }

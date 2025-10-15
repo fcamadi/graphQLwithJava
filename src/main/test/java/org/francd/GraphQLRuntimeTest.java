@@ -45,6 +45,7 @@ class GraphQLRuntimeTest {
                         province {
                             name
                             population
+                            area
                         }
                     }
                 }
@@ -75,7 +76,21 @@ class GraphQLRuntimeTest {
                         "population", 134794,
                         "province", Map.of(
                                 "name", "Bern",
-                                "population", 1043132)
+                                "population", 1043132,
+                                "area", 5959)
+                ))
+        );
+
+        assertThat(countries).contains(Map.of(
+                "name", "Italy",
+                "population", 59433744,
+                "capital", Map.of(
+                        "name", "Roma",
+                        "population", 2617175,
+                        "province", Map.of(
+                                "name", "Lazio",
+                                "population", 5502886,
+                                    "area", 17235)
                 ))
         );
     }
