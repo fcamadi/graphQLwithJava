@@ -11,6 +11,7 @@ import graphql.schema.idl.TypeDefinitionRegistry;
 import org.francd.fetchers.DBCityDataFetcher;
 import org.francd.fetchers.DBCountriesDataFetcher;
 import org.francd.fetchers.DBProvinceDataFetcher;
+import org.francd.fetchers.DBProvincesOfCountryDataFetcher;
 import org.francd.model.Country;
 import org.francd.model.Province;
 
@@ -56,6 +57,7 @@ public class GraphQLRuntime {
         return RuntimeWiring.newRuntimeWiring()
                 .type("Query", builder -> builder.dataFetcher("countries", new DBCountriesDataFetcher(dbConnection)))
                 .type("Country",  builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Country::capital)))
+                .type("Country",  builder -> builder.dataFetcher("provinces", new DBProvincesOfCountryDataFetcher(dbConnection)))
                 .type("Province", builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Province::capital)))
                 .type("City",  builder -> builder.dataFetcher("province", new DBProvinceDataFetcher(dbConnection)))
                 .build();

@@ -48,6 +48,14 @@ class GraphQLRuntimeTest {
                             area
                         }
                     }
+                    provinces {
+                        name
+                        capital {
+                            name
+                        }
+                        population
+                        area
+                    }
                 }
             }
         """;
@@ -68,19 +76,7 @@ class GraphQLRuntimeTest {
         var countries = (List<Map<String,Object>>)data.get("countries");
         assertThat(countries).hasSize(55);
 
-        assertThat(countries).contains(Map.of(
-                "name", "Switzerland",
-                "population", 8670300,
-                "capital", Map.of(
-                        "name", "Bern",
-                        "population", 134794,
-                        "province", Map.of(
-                                "name", "Bern",
-                                "population", 1043132,
-                                "area", 5959)
-                ))
-        );
-
+        /* Italy has many provinces
         assertThat(countries).contains(Map.of(
                 "name", "Italy",
                 "population", 59433744,
@@ -92,6 +88,26 @@ class GraphQLRuntimeTest {
                                 "population", 5502886,
                                     "area", 17235)
                 ))
+        );
+        */
+
+        // check also list of provinces
+        assertThat(countries).contains(Map.of(
+                "name", "Albania",
+                "population", 2821977,
+                "capital", Map.of(
+                        "name", "Tirana",
+                        "population", 418495,
+                        "province", Map.of(
+                                "name", "Albania",
+                                "population", 2821977,
+                                "area", 28750)),
+                "provinces", List.of(Map.of(
+                        "name", "Albania",
+                        "capital", Map.of(
+                                "name", "Tirana"),
+                        "population", 2821977,
+                        "area", 28750)))
         );
     }
 
