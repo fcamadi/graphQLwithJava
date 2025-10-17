@@ -32,7 +32,6 @@ public class DBCountriesDataFetcher implements DataFetcher<List<Country>>  {
         this.dbConnection = dbConnection;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Country> get(DataFetchingEnvironment environment) throws Exception {
 
@@ -61,12 +60,12 @@ public class DBCountriesDataFetcher implements DataFetcher<List<Country>>  {
 
         StateArgumentCollector collector = new StateArgumentCollector();
 
-        ArrayList<String> criteriaClauses = new ArrayList<>();
         Continent continent = (Continent)criteria.get("continent");
         if (continent != null) {
             stringWriter.append(" AND e.continent = ?");
             collector.addString(continent.dbName());
         }
+        @SuppressWarnings("unchecked")
         Map<String, Integer> populationRange = (Map<String, Integer>) criteria.get("populationRange");
         if (populationRange != null) {
             if (populationRange.containsKey("above")) {
