@@ -1,5 +1,14 @@
 type Query {
-    countries(continent: String): [Country]
+    countries(continent: Continent): [Country]
+}
+
+enum Continent {
+    Europe
+    Asia
+    Africa
+    SouthAmerica
+    NorthAmerica
+    Oceania
 }
 
 type Country {
