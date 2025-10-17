@@ -3,6 +3,7 @@ package org.francd.fetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.francd.db.Mapping;
+import org.francd.model.Continent;
 import org.francd.model.Country;
 
 import java.sql.Connection;
@@ -29,9 +30,9 @@ public class DBCountriesDataFetcher implements DataFetcher<List<Country>>  {
     @Override
     public List<Country> get(DataFetchingEnvironment environment) throws Exception {
 
-        String  continent = environment.getArgument("continent");
+        Continent continent = environment.getArgument("continent");
         var statement = dbConnection.prepareStatement(COUNTRY_SQL);
-        statement.setString(1, continent);
+        statement.setString(1, continent.dbName());
 
         ResultSet results = statement.executeQuery();
         List<Country> mappedResults = new ArrayList<>();
