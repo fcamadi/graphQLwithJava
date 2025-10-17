@@ -15,7 +15,7 @@ public enum Continent {
     }
 
     Continent() {
-        this.dbName = this.dbName();
+        this.dbName = this.name();
     }
 
     public String dbName() {

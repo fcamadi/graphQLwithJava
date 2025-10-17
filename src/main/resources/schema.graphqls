@@ -1,5 +1,15 @@
 type Query {
-    countries(continent: Continent): [Country]
+    countries(criteria: CountryCriteria): [Country]
+}
+
+input IntRange {
+    above: Int
+    below: Int
+}
+
+input CountryCriteria {
+    continent: Continent
+    populationRange: IntRange
 }
 
 enum Continent {
