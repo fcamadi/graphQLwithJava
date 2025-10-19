@@ -7,7 +7,6 @@ import org.francd.db.StateArgumentCollector;
 import org.francd.model.Continent;
 import org.francd.model.Country;
 
-import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -50,8 +49,8 @@ public class DBCountriesDataFetcher implements DataFetcher<List<Country>>  {
 
     private PreparedStatement queryWithCriteria(Map<String, Object> criteria) throws SQLException {
 
-        StringWriter stringWriter = new StringWriter();
-        stringWriter.append("""
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("""
             SELECT *
                 FROM country c, encompasses e
                 WHERE
@@ -62,22 +61,22 @@ public class DBCountriesDataFetcher implements DataFetcher<List<Country>>  {
 
         Continent continent = (Continent)criteria.get("continent");
         if (continent != null) {
-            stringWriter.append(" AND e.continent = ?");
+            stringBuilder.append(" AND e.continent = ?");
             collector.addString(continent.dbName());
         }
         @SuppressWarnings("unchecked")
         Map<String, Integer> populationRange = (Map<String, Integer>) criteria.get("populationRange");
         if (populationRange != null) {
             if (populationRange.containsKey("above")) {
-                stringWriter.append("  AND c.population >= ?");
+                stringBuilder.append("  AND c.population >= ?");
                 collector.addInt(populationRange.get("above"));
             }if (populationRange.containsKey("below")) {
-                stringWriter.append("  AND c.population <= ?");
+                stringBuilder.append("  AND c.population <= ?");
                 collector.addInt(populationRange.get("below"));
             }
         }
 
-        var statement = dbConnection.prepareStatement(stringWriter.toString());
+        var statement = dbConnection.prepareStatement(stringBuilder.toString());
         collector.applyTo(statement);
         return statement;
     }
