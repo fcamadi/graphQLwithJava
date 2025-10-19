@@ -17,14 +17,6 @@ import java.util.Map;
 
 public class DBCountriesDataFetcher implements DataFetcher<List<Country>>  {
 
-    private final static  String COUNTRY_SQL = """
-                SELECT *
-                FROM country c, encompasses e
-                WHERE
-                    e.continent = ?
-                    AND c.code = e.country
-                """;
-
     private final Connection dbConnection;
 
     public DBCountriesDataFetcher(Connection dbConnection) {
