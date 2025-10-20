@@ -9,7 +9,7 @@ import org.francd.model.Province;
 import java.sql.Connection;
 import java.sql.ResultSet;
 
-public class DBProvinceDataFetcher implements DataFetcher<Province>  {
+public class DBProvinceFromCapitalDataFetcher implements DataFetcher<Province>  {
 
     private final static  String PROVINCE_SQL = """
                 SELECT *
@@ -20,7 +20,7 @@ public class DBProvinceDataFetcher implements DataFetcher<Province>  {
 
     private final Connection dbConnection;
 
-    public DBProvinceDataFetcher(Connection dbConnection) {
+    public DBProvinceFromCapitalDataFetcher(Connection dbConnection) {
         this.dbConnection = dbConnection;
     }
 

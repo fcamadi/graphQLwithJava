@@ -4,6 +4,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.francd.db.Mapping;
 import org.francd.db.StateArgumentCollector;
+import org.francd.model.Country;
 import org.francd.model.Province;
 
 import java.sql.Connection;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unchecked")
 public class DBProvincesOfCountryDataFetcher implements DataFetcher<List<Province>>  {
 
     private final Connection dbConnection;
@@ -22,13 +24,17 @@ public class DBProvincesOfCountryDataFetcher implements DataFetcher<List<Provinc
         this.dbConnection = dbConnection;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<Province> get(DataFetchingEnvironment environment) throws Exception {
 
         Map<String, Object> criteria = environment.getArgument("criteria");  // It comes null. Why???
         if (environment.getVariables().containsKey("criteria")) {
             criteria = (Map<String, Object>) environment.getVariables().get("criteria");
+        }
+
+        Country country = environment.getSource();
+        if (country != null) {
+            criteria.put("country", country.name());
         }
 
         try (var statement = queryWithCriteria(criteria)) {
@@ -42,7 +48,7 @@ public class DBProvincesOfCountryDataFetcher implements DataFetcher<List<Provinc
         }
     }
 
-    @SuppressWarnings("unchecked")
+
     private PreparedStatement queryWithCriteria(Map<String, Object> criteria) throws SQLException {
 
         StringBuilder stringBuilder = new StringBuilder();

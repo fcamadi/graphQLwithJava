@@ -55,10 +55,11 @@ public class GraphQLRuntime {
                  //Wire Data Fetchers
                 .type("Query", builder -> builder.dataFetcher("countries", new DBCountriesDataFetcher(dbConnection)))
                 .type("Query", builder -> builder.dataFetcher("country", new DBOneCountryDataFetcher(dbConnection)))
+                .type("Query", builder -> builder.dataFetcher("provinces", new DBProvincesOfCountryDataFetcher(dbConnection)))
                 .type("Country",  builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Country::capital)))
                 .type("Country",  builder -> builder.dataFetcher("provinces", new DBProvincesOfCountryDataFetcher(dbConnection)))
                 .type("Province", builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Province::capital)))
-                .type("City",  builder -> builder.dataFetcher("province", new DBProvinceDataFetcher(dbConnection)))
+                .type("City",  builder -> builder.dataFetcher("province", new DBProvinceFromCapitalDataFetcher(dbConnection)))
                 .build();
     }
 
