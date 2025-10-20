@@ -1,6 +1,7 @@
 type Query {
     countries(criteria: CountryCriteria): [Country]
     country(criteria: ProvinceCriteria): Country
+    provinces(criteria: ProvinceCriteria): [Province]
 }
 
 input IntRange {
@@ -14,7 +15,7 @@ input CountryCriteria {
 }
 
 input ProvinceCriteria {
-    country: String!
+    country: String
     populationRange: IntRange
 }
 
