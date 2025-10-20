@@ -3,12 +3,14 @@ package org.francd;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.*;
 import org.francd.fetchers.*;
 import org.francd.model.Continent;
 import org.francd.model.Country;
 import org.francd.model.Province;
+import org.francd.model.SurfaceCoercing;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,9 +52,16 @@ public class GraphQLRuntime {
 
     private RuntimeWiring buildRuntimeWiring(Connection dbConnection) {
         return RuntimeWiring.newRuntimeWiring()
+                // Wire Scalars
+                .scalar(GraphQLScalarType.newScalar()
+                        .name("Surface")
+                        .description("It represents a surface: an amount and an unit (m² or km²)")
+                        .coercing(new SurfaceCoercing() {
+                        })
+                        .build())
                 //Wire Enums
                 .type("Continent", builder -> builder.enumValues(new NaturalEnumValuesProvider<>(Continent.class)))
-                 //Wire Data Fetchers
+                //Wire Data Fetchers
                 .type("Query", builder -> builder.dataFetcher("countries", new DBCountriesDataFetcher(dbConnection)))
                 .type("Query", builder -> builder.dataFetcher("country", new DBOneCountryDataFetcher(dbConnection)))
                 .type("Query", builder -> builder.dataFetcher("provinces", new DBProvincesOfCountryDataFetcher(dbConnection)))

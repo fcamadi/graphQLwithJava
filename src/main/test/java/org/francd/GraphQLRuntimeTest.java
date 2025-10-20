@@ -29,14 +29,14 @@ class GraphQLRuntimeTest {
         runtime = new GraphQLRuntime(dbConnection);
     }
 
-
+    // Fix list of provinces in query countries
     @SuppressWarnings("unchecked")
     @Test
     public void validQuery() {
         // Given
         var query = """
             {
-                countries(continent: "Europe") {
+                countries(criteria: { continent: Europe }) {
                     name
                     population
                     capital {
@@ -76,20 +76,6 @@ class GraphQLRuntimeTest {
         var countries = (List<Map<String,Object>>)data.get("countries");
         assertThat(countries).hasSize(55);
 
-        /* Italy has many provinces
-        assertThat(countries).contains(Map.of(
-                "name", "Italy",
-                "population", 59433744,
-                "capital", Map.of(
-                        "name", "Roma",
-                        "population", 2617175,
-                        "province", Map.of(
-                                "name", "Lazio",
-                                "population", 5502886,
-                                    "area", 17235)
-                ))
-        );
-        */
 
         // check also list of provinces
         assertThat(countries).contains(Map.of(
@@ -135,5 +121,59 @@ class GraphQLRuntimeTest {
         assertThat(result).isNotNull();
         assertThat(result.getErrors()).isNotEmpty();
         assertThat(result.getErrors().getFirst()).isInstanceOf(ValidationError.class);
+    }
+
+    @Test
+    public void validQueryCoercingSurface() {
+        // Given
+        var query = """
+            {
+                countries( criteria: { continent: Europe }) {
+                    name
+                    population
+                    area
+                    capital {
+                        name
+                        population
+                        province {
+                            name
+                            population
+                            area
+                        }
+                    }
+                }
+            }
+        """;
+
+        // When
+        ExecutionResult result = runtime.execute(query);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getErrors()).isEmpty();
+
+        //var resultData = result.getData();    //It returns directly a map with the countries
+        var output = result.toSpecification();  //It returns a Map<String,Object> with 3 maps: data, errors, and extensions
+        assertThat(output).isNotNull();         //(errors and extensions when present in execution result, of course)
+        var data = (Map<String,Object>)output.get("data");  //this way, we have to get first a map with name "data"
+        assertThat(data).isNotNull();
+        assertThat(data).containsKey("countries").extracting("countries").isInstanceOf(List.class);
+        var countries = (List<Map<String,Object>>)data.get("countries");
+        assertThat(countries).hasSize(55);
+
+        // check also list of provinces
+        assertThat(countries).contains(Map.of(
+                "name", "Albania",
+                "population", 2821977,
+                "area", "28750.0 km²",
+                "capital", Map.of(
+                        "name", "Tirana",
+                        "population", 418495,
+                        "province", Map.of(
+                                "name", "Albania",
+                                "population", 2821977,
+                                "area", 28750))
+                )
+        );
     }
 }
