@@ -4,7 +4,6 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.francd.db.Mapping;
 import org.francd.db.StateArgumentCollector;
-import org.francd.model.Country;
 import org.francd.model.Province;
 
 import java.sql.Connection;
@@ -16,14 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 public class DBProvincesOfCountryDataFetcher implements DataFetcher<List<Province>>  {
-
-    private final static  String PROVINCES_SQL = """
-            SELECT c.name as country, p."name", p.capital,p."area",p.population\s
-            FROM country c, province p
-                     WHERE
-                         p.country = c.code
-                         AND c.code = ?
-            """;
 
     private final Connection dbConnection;
 
