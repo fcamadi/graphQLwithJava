@@ -4,6 +4,8 @@ type Query {
     provinces(criteria: ProvinceCriteria): [Province]
 }
 
+scalar Surface
+
 input IntRange {
     above: Int
     below: Int
@@ -32,7 +34,7 @@ type Country {
     code: ID!
     name: String!
     population: Int
-    area: Int
+    area: Surface
     capital: City
     provinces: [Province!]
 }
