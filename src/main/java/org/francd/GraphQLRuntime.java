@@ -5,10 +5,7 @@ import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.*;
-import org.francd.fetchers.DBCityDataFetcher;
-import org.francd.fetchers.DBCountriesDataFetcher;
-import org.francd.fetchers.DBProvinceDataFetcher;
-import org.francd.fetchers.DBProvincesOfCountryDataFetcher;
+import org.francd.fetchers.*;
 import org.francd.model.Continent;
 import org.francd.model.Country;
 import org.francd.model.Province;
@@ -44,7 +41,7 @@ public class GraphQLRuntime {
 
     private TypeDefinitionRegistry buildTypeDefinitionRegistry() throws IOException {
         SchemaParser schemaParser = new SchemaParser();
-        try(InputStream is = GraphQLRuntime.class.getResourceAsStream("/schema.graphqls")) {
+        try(InputStream is = GraphQLRuntime.class.getResourceAsStream("/schema.graphql")) {
             assert is != null;
             Reader schemaReader = new InputStreamReader(is, StandardCharsets.UTF_8);
             return schemaParser.parse(schemaReader);
@@ -53,21 +50,21 @@ public class GraphQLRuntime {
 
     private RuntimeWiring buildRuntimeWiring(Connection dbConnection) {
         return RuntimeWiring.newRuntimeWiring()
-            //Wire Enums
-            .type("Continent", builder -> builder.enumValues(new NaturalEnumValuesProvider<>(Continent.class)))
-            //Wire Data Fetchers
-            .type("Query", builder -> builder.dataFetcher("countries", new DBCountriesDataFetcher(dbConnection)))
-            .type("Country",  builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Country::capital)))
-            .type("Country",  builder -> builder.dataFetcher("provinces", new DBProvincesOfCountryDataFetcher(dbConnection)))
-            .type("Province", builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Province::capital)))
-            .type("City",  builder -> builder.dataFetcher("province", new DBProvinceDataFetcher(dbConnection)))
-            .build();
+                //Wire Enums
+                .type("Continent", builder -> builder.enumValues(new NaturalEnumValuesProvider<>(Continent.class)))
+                 //Wire Data Fetchers
+                .type("Query", builder -> builder.dataFetcher("countries", new DBCountriesDataFetcher(dbConnection)))
+                .type("Query", builder -> builder.dataFetcher("country", new DBOneCountryDataFetcher(dbConnection)))
+                .type("Country",  builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Country::capital)))
+                .type("Country",  builder -> builder.dataFetcher("provinces", new DBProvincesOfCountryDataFetcher(dbConnection)))
+                .type("Province", builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Province::capital)))
+                .type("City",  builder -> builder.dataFetcher("province", new DBProvinceDataFetcher(dbConnection)))
+                .build();
     }
 
     public ExecutionResult execute(String query) {
         return execute(query,null,null);
     }
-
 
     public ExecutionResult execute(String query, Map<String, Object> variables, String operationName) {
         ExecutionInput.Builder executionInputBuilder = ExecutionInput.newExecutionInput()

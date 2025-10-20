@@ -38,31 +38,18 @@ public class DBOneCountryDataFetcher implements DataFetcher<Country>  {
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("""
-            SELECT c.name, c.code, c.capital, c.area, c.population
+            SELECT *
             FROM country c
-                INNER JOIN province p
-                    ON p.country = c.code
         """);
 
         StateArgumentCollector collector = new StateArgumentCollector();
 
         String country = criteria.get("country").toString();
         if (country != null) {
-            stringBuilder.append(" WHERE c.name = ?");
+            stringBuilder.append(" WHERE name = ?");
             collector.addString(country);
         } else {
             throw new RuntimeException("You must select a country!");
-        }
-        @SuppressWarnings("unchecked")
-        Map<String, Integer> populationRange = (Map<String, Integer>) criteria.get("populationRange");
-        if (populationRange != null) {
-            if (populationRange.containsKey("above")) {
-                stringBuilder.append("  AND p.population >= ?");
-                collector.addInt(populationRange.get("above"));
-            }if (populationRange.containsKey("below")) {
-                stringBuilder.append("  AND p.population <= ?");
-                collector.addInt(populationRange.get("below"));
-            }
         }
 
         var statement = dbConnection.prepareStatement(stringBuilder.toString());
