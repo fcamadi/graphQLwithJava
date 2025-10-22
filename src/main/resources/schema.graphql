@@ -1,7 +1,19 @@
 type Query {
+    """
+    It allows to retrieve a list of countries that match the specified criteria
+    """
     countries(criteria: CountryCriteria): [Country]
+    """
+    It allows to retrieve a country with a list of its provinces that match the specified criteria
+    """
     country(criteria: ProvinceCriteria): Country
+    """
+    It allows to retrieve a list of provinces that match the specified criteria
+    """
     provinces(criteria: ProvinceCriteria): [Province]
+    """
+    It allows to retrieve a list of places that match the specified criteria (the name)
+    """
     places(criteria: PlaceCriteria): [Place]
 }
 
@@ -26,6 +38,9 @@ input ProvinceCriteria {
     populationRange: IntRange
 }
 
+"""
+List of continents
+"""
 enum Continent {
     Europe
     Asia
@@ -35,7 +50,15 @@ enum Continent {
     Oceania
 }
 
-type Country {
+interface Place {
+    name: String!
+    population: Int
+}
+
+"""
+Info about countries
+"""
+type Country implements Place {
     code: ID!
     name: String!
     population: Int
@@ -44,7 +67,10 @@ type Country {
     provinces: [Province!]
 }
 
-type City {
+"""
+Info about cities
+"""
+type City implements Place {
     name: String!
     population: Int
     geoLocation: GeoCoord
@@ -52,7 +78,10 @@ type City {
     province: Province
 }
 
-type Province {
+"""
+Info about provinces
+"""
+type Province implements Place {
     name: String!
     population: Int
     capital: City
@@ -64,4 +93,4 @@ type GeoCoord {
     longitude: Float!
 }
 
-union Place = Country | Province | City
+#union Place = Country | Province | City
