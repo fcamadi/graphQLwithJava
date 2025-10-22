@@ -52,7 +52,7 @@ public class GraphQLRuntime {
 
     private RuntimeWiring buildRuntimeWiring(Connection dbConnection) {
         return RuntimeWiring.newRuntimeWiring()
-                // Wire Scalars
+                //Wire Scalars
                 .scalar(GraphQLScalarType.newScalar()
                         .name("Surface")
                         .description("It represents a surface: an amount and an unit (m² or km²)")
@@ -61,10 +61,15 @@ public class GraphQLRuntime {
                         .build())
                 //Wire Enums
                 .type("Continent", builder -> builder.enumValues(new NaturalEnumValuesProvider<>(Continent.class)))
+
+                //Wire type resolvers for unions and interfaces
+                .type("Place", builder -> builder.typeResolver(new PojoClassTypeResolver()))
+
                 //Wire Data Fetchers
                 .type("Query", builder -> builder.dataFetcher("countries", new DBCountriesDataFetcher(dbConnection)))
                 .type("Query", builder -> builder.dataFetcher("country", new DBOneCountryDataFetcher(dbConnection)))
                 .type("Query", builder -> builder.dataFetcher("provinces", new DBProvincesOfCountryDataFetcher(dbConnection)))
+                .type("Query",  builder -> builder.dataFetcher("places", new DBPlacesDataFetcher(dbConnection)))
                 .type("Country",  builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Country::capital)))
                 .type("Country",  builder -> builder.dataFetcher("provinces", new DBProvincesOfCountryDataFetcher(dbConnection)))
                 .type("Province", builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Province::capital)))
