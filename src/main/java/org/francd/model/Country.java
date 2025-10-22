@@ -6,5 +6,5 @@ public record Country(
         Integer population,
         Integer area,
         String capital
-) {}
+) implements  Place  {}
 

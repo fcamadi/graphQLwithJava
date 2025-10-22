@@ -5,4 +5,4 @@ public record Province(
         Integer population,
         String capital,
         Integer area
-) {}
+) implements  Place {}

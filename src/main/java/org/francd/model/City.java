@@ -6,5 +6,5 @@ public record City(
         GeoCoord geoLocation,
         Integer elevation,
         String province
-) {}
+) implements Place {}
 
