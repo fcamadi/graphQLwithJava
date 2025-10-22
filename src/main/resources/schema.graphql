@@ -2,6 +2,7 @@ type Query {
     countries(criteria: CountryCriteria): [Country]
     country(criteria: ProvinceCriteria): Country
     provinces(criteria: ProvinceCriteria): [Province]
+    places(criteria: PlaceCriteria): [Place]
 }
 
 scalar Surface
@@ -9,6 +10,10 @@ scalar Surface
 input IntRange {
     above: Int
     below: Int
+}
+
+input PlaceCriteria {
+    name: String
 }
 
 input CountryCriteria {
@@ -58,3 +63,5 @@ type GeoCoord {
     latitude: Float!
     longitude: Float!
 }
+
+union Place = Country | Province | City
