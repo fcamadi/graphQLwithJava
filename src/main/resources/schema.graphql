@@ -83,12 +83,12 @@ type City implements Place {
 """
 Info about provinces
 """
-type Province implements Place {
-    name: String!
-    population: Int
-    capital: City
-    area: Int
-}
+#type Province implements Place {
+#    name: String!
+#    population: Int
+#    capital: City
+#    area: Int
+#}
 
 type GeoCoord {
     latitude: Float!
