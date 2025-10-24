@@ -3,7 +3,6 @@ package org.francd;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
-import graphql.language.*;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.*;
@@ -58,29 +57,8 @@ public class GraphQLRuntime {
         #    capital: City
         #    area: Int
         #}
-         */
-        typeRegistry.add(ObjectTypeDefinition.newObjectTypeDefinition()
-                .name("Province")
-                        .description(new Description("Added via code in GraphQLRuntime",null,false))
-                        .fieldDefinition(FieldDefinition.newFieldDefinition()
-                            .name("name")
-                            .type(new NonNullType(new TypeName("String")))
-                            .build())
-                        .fieldDefinition(FieldDefinition.newFieldDefinition()
-                            .name("population")
-                            .type(new NonNullType(new TypeName("Int")))
-                            .build())
-                        .fieldDefinition(FieldDefinition.newFieldDefinition()
-                            .name("capital")
-                            .type(new NonNullType(new TypeName("City")))
-                            .build())
-                        .fieldDefinition(FieldDefinition.newFieldDefinition()
-                            .name("area")
-                            .type(new NonNullType(new TypeName("Int")))
-                            .build())
-                .implementz(new TypeName("Place"))
-                .build()
-        );
+        */
+        typeRegistry.add(TypeHelper.objectDefinitionOf(Province.class));
 
         return typeRegistry;
     }
