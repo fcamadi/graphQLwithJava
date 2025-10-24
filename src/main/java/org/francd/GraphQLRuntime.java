@@ -16,7 +16,6 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.util.Map;
-import java.util.Optional;
 
 public class GraphQLRuntime {
 
@@ -49,16 +48,10 @@ public class GraphQLRuntime {
             typeRegistry = schemaParser.parse(schemaReader);
         }
 
-        //But we add a "new" type
-        /*
-        #type Province implements Place {
-        #    name: String!
-        #    population: Int
-        #    capital: City
-        #    area: Int
-        #}
-        */
+        //But we add a "Province" programmatically
         typeRegistry.add(TypeHelper.objectDefinitionOf(Province.class));
+        // We add also the City
+        typeRegistry.add(TypeHelper.objectDefinitionOf(City.class));
 
         return typeRegistry;
     }
@@ -88,7 +81,7 @@ public class GraphQLRuntime {
                 .type("Province", builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Province::capital)))
                 .type("City",  builder -> builder
                         .dataFetcher("province", new DBProvinceFromCapitalDataFetcher(dbConnection))
-                        //wire old fields for backwards compatibility
+                        /* //wire old fields for backwards compatibility
                         .dataFetcher("latitude", env -> {
                             City city = env.getSource();
                             return Optional.ofNullable(city).map(City::geoLocation).map(GeoCoord::latitude).orElse(null);
@@ -97,6 +90,7 @@ public class GraphQLRuntime {
                             City city = env.getSource();
                             return Optional.ofNullable(city).map(City::geoLocation).map(GeoCoord::longitude).orElse(null);
                         })
+                        */
                 )
                 .build();
     }

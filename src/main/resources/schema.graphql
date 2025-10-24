@@ -67,22 +67,22 @@ type Country implements Place {
     provinces: [Province!]
 }
 
-"""
-Info about cities
-"""
-type City implements Place {
-    name: String!
-    population: Int
-    latitude: Float @deprecated(reason: "Use geoLocation")
-    longitude: Float @deprecated(reason: "Use geoLocation")
-    geoLocation: GeoCoord
-    elevation: Int
-    province: Province
-}
+#"""
+#Info about cities
+#"""
+#type City implements Place {
+#    name: String!
+#    population: Int
+#    latitude: Float @deprecated(reason: "Use geoLocation")
+#    longitude: Float @deprecated(reason: "Use geoLocation")
+#    geoLocation: GeoCoord
+#    elevation: Int
+#    province: Province
+#}
 
-"""
-Info about provinces
-"""
+#"""
+#Info about provinces
+#"""
 #type Province implements Place {
 #    name: String!
 #    population: Int
