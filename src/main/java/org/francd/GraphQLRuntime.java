@@ -3,14 +3,12 @@ package org.francd;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import graphql.language.*;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.*;
 import org.francd.fetchers.*;
-import org.francd.model.Continent;
-import org.francd.model.Country;
-import org.francd.model.Province;
-import org.francd.model.SurfaceCoercing;
+import org.francd.model.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +17,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.util.Map;
+import java.util.Optional;
 
 public class GraphQLRuntime {
 
@@ -41,13 +40,49 @@ public class GraphQLRuntime {
         graphql = GraphQL.newGraphQL(schema).build();
     }
 
+    //We read and parse the schema
     private TypeDefinitionRegistry buildTypeDefinitionRegistry() throws IOException {
         SchemaParser schemaParser = new SchemaParser();
+        TypeDefinitionRegistry typeRegistry;
         try(InputStream is = GraphQLRuntime.class.getResourceAsStream("/schema.graphql")) {
             assert is != null;
             Reader schemaReader = new InputStreamReader(is, StandardCharsets.UTF_8);
-            return schemaParser.parse(schemaReader);
+            typeRegistry = schemaParser.parse(schemaReader);
         }
+
+        //But we add a "new" type
+        /*
+        #type Province implements Place {
+        #    name: String!
+        #    population: Int
+        #    capital: City
+        #    area: Int
+        #}
+         */
+        typeRegistry.add(ObjectTypeDefinition.newObjectTypeDefinition()
+                .name("Province")
+                        .description(new Description("Added via code in GraphQLRuntime",null,false))
+                        .fieldDefinition(FieldDefinition.newFieldDefinition()
+                            .name("name")
+                            .type(new NonNullType(new TypeName("String")))
+                            .build())
+                        .fieldDefinition(FieldDefinition.newFieldDefinition()
+                            .name("population")
+                            .type(new NonNullType(new TypeName("Int")))
+                            .build())
+                        .fieldDefinition(FieldDefinition.newFieldDefinition()
+                            .name("capital")
+                            .type(new NonNullType(new TypeName("City")))
+                            .build())
+                        .fieldDefinition(FieldDefinition.newFieldDefinition()
+                            .name("area")
+                            .type(new NonNullType(new TypeName("Int")))
+                            .build())
+                .implementz(new TypeName("Place"))
+                .build()
+        );
+
+        return typeRegistry;
     }
 
     private RuntimeWiring buildRuntimeWiring(Connection dbConnection) {
@@ -73,7 +108,18 @@ public class GraphQLRuntime {
                 .type("Country",  builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Country::capital)))
                 .type("Country",  builder -> builder.dataFetcher("provinces", new DBProvincesOfCountryDataFetcher(dbConnection)))
                 .type("Province", builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Province::capital)))
-                .type("City",  builder -> builder.dataFetcher("province", new DBProvinceFromCapitalDataFetcher(dbConnection)))
+                .type("City",  builder -> builder
+                        .dataFetcher("province", new DBProvinceFromCapitalDataFetcher(dbConnection))
+                        //wire old fields for backwards compatibility
+                        .dataFetcher("latitude", env -> {
+                            City city = env.getSource();
+                            return Optional.ofNullable(city).map(City::geoLocation).map(GeoCoord::latitude).orElse(null);
+                        })
+                        .dataFetcher("longitude", env -> {
+                            City city = env.getSource();
+                            return Optional.ofNullable(city).map(City::geoLocation).map(GeoCoord::longitude).orElse(null);
+                        })
+                )
                 .build();
     }
 
