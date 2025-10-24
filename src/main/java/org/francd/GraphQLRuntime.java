@@ -7,6 +7,7 @@ import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.*;
 import org.francd.fetchers.*;
+import org.francd.instrumentation.LoggingInstrumentation;
 import org.francd.model.*;
 
 import java.io.IOException;
@@ -35,7 +36,9 @@ public class GraphQLRuntime {
         GraphQLSchema schema = schemaGenerator.makeExecutableSchema(typeRegistry, wiring);
         // This builds a GraphQL object that can later be called with execute(query)
         // to run queries against the schema.
-        graphql = GraphQL.newGraphQL(schema).build();
+        graphql = GraphQL.newGraphQL(schema)
+                .instrumentation(new LoggingInstrumentation())
+                .build();
     }
 
     //We read and parse the schema
