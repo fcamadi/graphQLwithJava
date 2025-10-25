@@ -7,7 +7,7 @@ import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.*;
 import org.francd.fetchers.*;
-import org.francd.instrumentation.LoggingInstrumentation;
+import org.francd.instrumentation.AccessControlInstrumentation;
 import org.francd.model.*;
 
 import java.io.IOException;
@@ -17,6 +17,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.util.Map;
+import java.util.Set;
 
 public class GraphQLRuntime {
 
@@ -37,7 +38,8 @@ public class GraphQLRuntime {
         // This builds a GraphQL object that can later be called with execute(query)
         // to run queries against the schema.
         graphql = GraphQL.newGraphQL(schema)
-                .instrumentation(new LoggingInstrumentation())
+                //.instrumentation(new LoggingInstrumentation())
+                .instrumentation(new AccessControlInstrumentation())
                 .build();
     }
 
@@ -99,11 +101,12 @@ public class GraphQLRuntime {
     }
 
     public ExecutionResult execute(String query) {
-        return execute(query,null,null);
+        return execute(query,null,null, Set.of());
     }
 
-    public ExecutionResult execute(String query, Map<String, Object> variables, String operationName) {
+    public ExecutionResult execute(String query, Map<String, Object> variables, String operationName, Set<String> permissions) {
         ExecutionInput.Builder executionInputBuilder = ExecutionInput.newExecutionInput()
+                .graphQLContext(Map.of("permissions", permissions))
                 .query(query);
         if (variables != null) {
             executionInputBuilder.variables(variables);

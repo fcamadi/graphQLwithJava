@@ -14,7 +14,9 @@ import org.francd.GraphQLRuntime;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class GraphQLHandler extends Handler.Abstract {
 
@@ -29,7 +31,9 @@ public class GraphQLHandler extends Handler.Abstract {
     @Override
     public boolean handle(Request httpRequest, Response response, Callback callback) throws Exception {
         GraphQLRequest graphQLRequest = graphqlRequestFromHttp(httpRequest);
-        ExecutionResult executionResult = graphQLRuntime.execute(graphQLRequest.query(), graphQLRequest.variables(), graphQLRequest.operationName());
+        String permissionsStr = Optional.ofNullable(httpRequest.getHeaders().get("X-Permissions")).orElse("");
+        var permissions = Arrays.stream(permissionsStr.split(",")).map(String::trim).collect(Collectors.toSet());
+        ExecutionResult executionResult = graphQLRuntime.execute(graphQLRequest.query(), graphQLRequest.variables(), graphQLRequest.operationName(), permissions);
         Content.Sink.write(response, true, mapper.writeValueAsString(executionResult.toSpecification()), callback);
         return true;
     }
