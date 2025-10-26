@@ -7,7 +7,7 @@ import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.*;
 import org.francd.fetchers.*;
-import org.francd.instrumentation.AccessControlInstrumentation;
+import org.francd.instrumentation.DataFetcherCounterInstrumentation;
 import org.francd.model.*;
 
 import java.io.IOException;
@@ -39,7 +39,8 @@ public class GraphQLRuntime {
         // to run queries against the schema.
         graphql = GraphQL.newGraphQL(schema)
                 //.instrumentation(new LoggingInstrumentation())
-                .instrumentation(new AccessControlInstrumentation())
+                //.instrumentation(new AccessControlInstrumentation())
+                .instrumentation(new DataFetcherCounterInstrumentation())
                 .build();
     }
 
