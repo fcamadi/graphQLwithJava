@@ -3,11 +3,13 @@ package org.francd;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import graphql.execution.instrumentation.ChainedInstrumentation;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.*;
 import org.francd.fetchers.*;
 import org.francd.instrumentation.DataFetcherCounterInstrumentation;
+import org.francd.instrumentation.LoggingInstrumentation;
 import org.francd.model.*;
 
 import java.io.IOException;
@@ -18,6 +20,8 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.util.Map;
 import java.util.Set;
+
+import static graphql.schema.AsyncDataFetcher.async;
 
 public class GraphQLRuntime {
 
@@ -37,10 +41,18 @@ public class GraphQLRuntime {
         GraphQLSchema schema = schemaGenerator.makeExecutableSchema(typeRegistry, wiring);
         // This builds a GraphQL object that can later be called with execute(query)
         // to run queries against the schema.
+
+        // To add more than one instrumentation class:
+        ChainedInstrumentation chainedInstrumentations = new ChainedInstrumentation(
+                new LoggingInstrumentation(),
+                new DataFetcherCounterInstrumentation()
+        );
+
         graphql = GraphQL.newGraphQL(schema)
                 //.instrumentation(new LoggingInstrumentation())
                 //.instrumentation(new AccessControlInstrumentation())
-                .instrumentation(new DataFetcherCounterInstrumentation())
+                //.instrumentation(new DataFetcherCounterInstrumentation())  // the last one is the only one applied
+                .instrumentation(chainedInstrumentations)
                 .build();
     }
 
@@ -63,7 +75,10 @@ public class GraphQLRuntime {
     }
 
     private RuntimeWiring buildRuntimeWiring(Connection dbConnection) {
-        return RuntimeWiring.newRuntimeWiring()
+
+        //try (ExecutorService executorService = Executors.newFixedThreadPool(8)) {
+
+            return RuntimeWiring.newRuntimeWiring()
                 //Wire Scalars
                 .scalar(GraphQLScalarType.newScalar()
                         .name("Surface")
@@ -78,15 +93,16 @@ public class GraphQLRuntime {
                 .type("Place", builder -> builder.typeResolver(new PojoClassTypeResolver()))
 
                 //Wire Data Fetchers
-                .type("Query", builder -> builder.dataFetcher("countries", new DBCountriesDataFetcher(dbConnection)))
-                .type("Query", builder -> builder.dataFetcher("country", new DBOneCountryDataFetcher(dbConnection)))
-                .type("Query", builder -> builder.dataFetcher("provinces", new DBProvincesOfCountryDataFetcher(dbConnection)))
-                .type("Query",  builder -> builder.dataFetcher("places", new DBPlacesDataFetcher(dbConnection)))
-                .type("Country",  builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Country::capital)))
-                .type("Country",  builder -> builder.dataFetcher("provinces", new DBProvincesOfCountryDataFetcher(dbConnection)))
-                .type("Province", builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Province::capital)))
+                //.type("Query", builder -> builder.dataFetcher("countries", async(new DBCountriesDataFetcher(dbConnection), executorService)))
+                .type("Query", builder -> builder.dataFetcher("countries", new AsyncDBCountriesDataFetcher(dbConnection)))
+                .type("Query", builder -> builder.dataFetcher("country", async(new DBOneCountryDataFetcher(dbConnection))))
+                .type("Query", builder -> builder.dataFetcher("provinces", async(new DBProvincesOfCountryDataFetcher(dbConnection))))
+                .type("Query",  builder -> builder.dataFetcher("places", async(new DBPlacesDataFetcher(dbConnection))))
+                .type("Country",  builder -> builder.dataFetcher("capital", async(new DBCityDataFetcher<>(dbConnection,Country::capital))))
+                .type("Country",  builder -> builder.dataFetcher("provinces", async(new DBProvincesOfCountryDataFetcher(dbConnection))))
+                .type("Province", builder -> builder.dataFetcher("capital", async(new DBCityDataFetcher<>(dbConnection,Province::capital))))
                 .type("City",  builder -> builder
-                        .dataFetcher("province", new DBProvinceFromCapitalDataFetcher(dbConnection))
+                        .dataFetcher("province", async(new DBProvinceFromCapitalDataFetcher(dbConnection)))
                         /* //wire old fields for backwards compatibility
                         .dataFetcher("latitude", env -> {
                             City city = env.getSource();
@@ -99,6 +115,7 @@ public class GraphQLRuntime {
                         */
                 )
                 .build();
+        //} try
     }
 
     public ExecutionResult execute(String query) {
