@@ -5,11 +5,15 @@ import graphql.schema.DataFetchingEnvironment;
 import org.francd.db.Mapping;
 import org.francd.model.City;
 import org.francd.model.Province;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 
 public class DBProvinceFromCapitalDataFetcher implements DataFetcher<Province>  {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DBProvinceFromCapitalDataFetcher.class);
 
     private final static  String PROVINCE_SQL = """
                 SELECT *
@@ -30,6 +34,8 @@ public class DBProvinceFromCapitalDataFetcher implements DataFetcher<Province>  
         City capital = environment.getSource();
         var statement = dbConnection.prepareStatement(PROVINCE_SQL);
         statement.setString(1, capital.name());
+
+        LOGGER.info(PROVINCE_SQL.replaceAll("[\\s\\n]+", " "));
 
         ResultSet result = statement.executeQuery();
         if (result.next()) {

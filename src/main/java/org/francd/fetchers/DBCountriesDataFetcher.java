@@ -6,6 +6,8 @@ import org.francd.db.Mapping;
 import org.francd.db.StateArgumentCollector;
 import org.francd.model.Continent;
 import org.francd.model.Country;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 public class DBCountriesDataFetcher implements DataFetcher<List<Country>>  {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DBCountriesDataFetcher.class);
 
     private final Connection dbConnection;
 
@@ -70,6 +74,7 @@ public class DBCountriesDataFetcher implements DataFetcher<List<Country>>  {
 
         var statement = dbConnection.prepareStatement(stringBuilder.toString());
         collector.applyTo(statement);
+        LOGGER.info(stringBuilder.toString().trim().replaceAll("[\\s\\n]+", " "));
         return statement;
     }
 }

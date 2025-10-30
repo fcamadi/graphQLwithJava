@@ -6,6 +6,8 @@ import org.francd.db.Mapping;
 import org.francd.db.StateArgumentCollector;
 import org.francd.model.Country;
 import org.francd.model.Province;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,6 +19,8 @@ import java.util.Map;
 
 @SuppressWarnings("unchecked")
 public class DBProvincesOfCountryDataFetcher implements DataFetcher<List<Province>>  {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DBProvincesOfCountryDataFetcher.class);
 
     private final Connection dbConnection;
 
@@ -39,6 +43,7 @@ public class DBProvincesOfCountryDataFetcher implements DataFetcher<List<Provinc
 
         try (var statement = queryWithCriteria(criteria)) {
             ResultSet result = statement.executeQuery();
+
             List<Province> mappedResults = new ArrayList<>();
             while (result.next()) {
                 Province province = Mapping.provinceOf(result);
@@ -82,6 +87,7 @@ public class DBProvincesOfCountryDataFetcher implements DataFetcher<List<Provinc
 
         var statement = dbConnection.prepareStatement(stringBuilder.toString());
         collector.applyTo(statement);
+        LOGGER.info(stringBuilder.toString().trim().replaceAll("[\\s\\n]+", " "));
         return statement;
     }
 
