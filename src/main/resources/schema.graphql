@@ -30,12 +30,13 @@ input PlaceCriteria {
 
 input CountryCriteria {
     continent: Continent
-    populationRange: IntRange
+    populationCountryRange: IntRange
+    populationProvinceRange: IntRange
 }
 
 input ProvinceCriteria {
     country: String
-    populationRange: IntRange
+    populationProvinceRange: IntRange
 }
 
 """
