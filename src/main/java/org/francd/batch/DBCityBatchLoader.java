@@ -62,8 +62,7 @@ public class DBCityBatchLoader implements BatchLoader<String, City> {
 
                 //this is what guarantees the right order: we get the order in the keys,
                 //so we use the keys to return the results back:
-                //return keys.stream().map(mappedResults::get).toList();
-                return keys.stream().map(r -> mappedResults.get(r)).toList();
+                return keys.stream().map(mappedResults::get).toList();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
