@@ -67,6 +67,7 @@ public class DBProvincesOfCountryDataFetcher implements DataFetcher<List<Provinc
         StateArgumentCollector collector = new StateArgumentCollector();
 
         String country = criteria.get("country").toString();
+        LOGGER.info("country: {}", country);
         if (country != null) {
             stringBuilder.append(" WHERE c.name = ?");
             collector.addString(country);
@@ -87,7 +88,7 @@ public class DBProvincesOfCountryDataFetcher implements DataFetcher<List<Provinc
 
         var statement = dbConnection.prepareStatement(stringBuilder.toString());
         collector.applyTo(statement);
-        LOGGER.info(stringBuilder.toString().trim().replaceAll("[\\s\\n]+", " "));
+        //LOGGER.info(stringBuilder.toString().trim().replaceAll("[\\s\\n]+", " "));
         return statement;
     }
 
