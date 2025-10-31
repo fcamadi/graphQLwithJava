@@ -74,7 +74,7 @@ public class DBProvincesOfCountryDataFetcher implements DataFetcher<List<Provinc
             throw new RuntimeException("You must select a country!");
         }
 
-        Map<String, Integer> populationRange = (Map<String, Integer>) criteria.get("populationRange");
+        Map<String, Integer> populationRange = (Map<String, Integer>) criteria.get("populationProvinceRange");
         if (populationRange != null) {
             if (populationRange.containsKey("above")) {
                 stringBuilder.append("  AND p.population >= ?");

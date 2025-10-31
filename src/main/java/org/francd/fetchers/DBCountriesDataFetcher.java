@@ -61,7 +61,7 @@ public class DBCountriesDataFetcher implements DataFetcher<List<Country>>  {
             collector.addString(continent.dbName());
         }
         @SuppressWarnings("unchecked")
-        Map<String, Integer> populationRange = (Map<String, Integer>) criteria.get("populationRange");
+        Map<String, Integer> populationRange = (Map<String, Integer>) criteria.get("populationCountryRange");
         if (populationRange != null) {
             if (populationRange.containsKey("above")) {
                 stringBuilder.append("  AND c.population >= ?");
