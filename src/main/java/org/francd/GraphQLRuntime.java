@@ -25,8 +25,6 @@ import java.sql.Connection;
 import java.util.Map;
 import java.util.Set;
 
-import static graphql.schema.AsyncDataFetcher.async;
-
 public class GraphQLRuntime {
 
     private final GraphQL graphql;
