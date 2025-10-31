@@ -87,8 +87,7 @@ public class GraphQLRuntime {
                 .scalar(GraphQLScalarType.newScalar()
                         .name("Surface")
                         .description("It represents a surface: an amount and an unit (m² or km²)")
-                        .coercing(new SurfaceCoercing() {
-                        })
+                        .coercing(new SurfaceCoercing())
                         .build())
                 //Wire Enums
                 .type("Continent", builder -> builder.enumValues(new NaturalEnumValuesProvider<>(Continent.class)))
@@ -97,19 +96,25 @@ public class GraphQLRuntime {
                 .type("Place", builder -> builder.typeResolver(new PojoClassTypeResolver()))
 
                 //Wire Data Fetchers
-                .type("Query", builder -> builder.dataFetcher("countries", new DBCountriesDataFetcher(dbConnection)))
-                .type("Query", builder -> builder.dataFetcher("country", new DBOneCountryDataFetcher(dbConnection)))
-                .type("Query", builder -> builder.dataFetcher("provinces", new DBProvincesOfCountryDataFetcher(dbConnection)))
-                .type("Query",  builder -> builder.dataFetcher("places", new DBPlacesDataFetcher(dbConnection)))
+                .type("Query", builder ->
+                    builder
+                        .dataFetcher("countries", new DBCountriesDataFetcher(dbConnection))
+                        .dataFetcher("country", new DBOneCountryDataFetcher(dbConnection))
+                        .dataFetcher("provinces", new DBProvincesOfCountryDataFetcher(dbConnection))
+                        .dataFetcher("places", new DBPlacesDataFetcher(dbConnection)))
 
                 //.type("Country",  builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Country::capital)))
-                .type("Country",  builder -> builder.dataFetcher("capital", new BatchCityDataFetcher<>(Country::capital)))
+                .type("Country", builder ->
+                    builder
+                        .dataFetcher("capital", new BatchCityDataFetcher<>(Country::capital))
+                        .dataFetcher("provinces", new DBProvincesOfCountryDataFetcher(dbConnection)))
+                        //.dataFetcher("provinces", new DBProvinceDataFetcher(dbConnection)))
 
-                .type("Country",  builder -> builder.dataFetcher("provinces", new DBProvincesOfCountryDataFetcher(dbConnection)))
                 //.type("Province", builder -> builder.dataFetcher("capital", new DBCityDataFetcher<>(dbConnection,Province::capital)))
                 .type("Province", builder -> builder.dataFetcher("capital", new BatchCityDataFetcher<>(Province::capital)))
                 .type("City",  builder -> builder
-                                .dataFetcher("province", new DBProvinceFromCapitalDataFetcher(dbConnection))
+                                //.dataFetcher("province", new DBProvinceFromCapitalDataFetcher(dbConnection))
+                                .dataFetcher("province", new DBProvinceDataFetcher(dbConnection))
                         /* //wire old fields for backwards compatibility
                         .dataFetcher("latitude", env -> {
                             City city = env.getSource();
