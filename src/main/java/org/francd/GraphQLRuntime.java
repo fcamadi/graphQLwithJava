@@ -11,6 +11,7 @@ import org.dataloader.DataLoaderFactory;
 import org.dataloader.DataLoaderOptions;
 import org.dataloader.DataLoaderRegistry;
 import org.francd.batch.DBCityBatchLoader;
+import org.francd.batch.DBProvinceBatchLoader;
 import org.francd.fetchers.*;
 import org.francd.instrumentation.DataFetcherCounterInstrumentation;
 import org.francd.instrumentation.LoggingInstrumentation;
@@ -114,7 +115,8 @@ public class GraphQLRuntime {
                 .type("Province", builder -> builder.dataFetcher("capital", new BatchCityDataFetcher<>(Province::capital)))
                 .type("City",  builder -> builder
                                 //.dataFetcher("province", new DBProvinceFromCapitalDataFetcher(dbConnection))
-                                .dataFetcher("province", new DBProvinceDataFetcher(dbConnection))
+                                //.dataFetcher("province", new DBProvinceDataFetcher(dbConnection))
+                                .dataFetcher("province", new BatchProvinceDataFetcher())
                         /* //wire old fields for backwards compatibility
                         .dataFetcher("latitude", env -> {
                             City city = env.getSource();
@@ -136,11 +138,17 @@ public class GraphQLRuntime {
     public ExecutionResult execute(String query, Map<String, Object> variables, String operationName, Set<String> permissions) {
 
         var cityDataLoader = DataLoaderFactory.newDataLoader(
-            new DBCityBatchLoader(dbConnection), // we can set cache options here, max batch size ...
+            new DBCityBatchLoader(dbConnection),
+                DataLoaderOptions.newOptions().setMaxBatchSize(10).setCachingEnabled(true)
+        );
+        var provinceDataLoader = DataLoaderFactory.newDataLoader(
+                new DBProvinceBatchLoader(dbConnection),
                 DataLoaderOptions.newOptions().setMaxBatchSize(10).setCachingEnabled(true)
         );
         DataLoaderRegistry dataLoaderRegistry = new DataLoaderRegistry();
-        dataLoaderRegistry.register("City", cityDataLoader);
+        dataLoaderRegistry
+                .register("City", cityDataLoader)
+                .register("Province", provinceDataLoader);
 
         ExecutionInput.Builder executionInputBuilder = ExecutionInput.newExecutionInput()
                 .graphQLContext(Map.of("permissions", permissions))
