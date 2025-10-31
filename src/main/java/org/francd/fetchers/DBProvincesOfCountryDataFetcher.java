@@ -45,10 +45,17 @@ public class DBProvincesOfCountryDataFetcher implements DataFetcher<List<Provinc
             ResultSet result = statement.executeQuery();
 
             List<Province> mappedResults = new ArrayList<>();
+            StringBuilder provincesOfCountry = new StringBuilder();
+            provincesOfCountry.append("provinces: [");
+
             while (result.next()) {
                 Province province = Mapping.provinceOf(result);
                 mappedResults.add(province);
+                provincesOfCountry.append(province.name()).append(",");
             }
+            provincesOfCountry.deleteCharAt(provincesOfCountry.length()-1).append("]");
+            LOGGER.info(provincesOfCountry.toString());
+
             return mappedResults;
         }
     }
