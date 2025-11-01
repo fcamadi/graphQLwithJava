@@ -1,0 +1,199 @@
+{
+	"info": {
+		"_postman_id": "35877d28-0d89-4a49-ac03-66a74e93635c",
+		"name": "graphQL - Udemy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8398595"
+	},
+	"item": [
+		{
+			"name": "country",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query provincesOfCountry(\n    $criteria: ProvinceCriteria\n    $noCode: Boolean! = true\n    $detailed: Boolean!\n) {\n    country(criteria: $criteria) {\n        code @skip(if: $noCode)\n        name\n        population @include(if: $detailed)\n        area\n        capital {\n            ...cityData\n        }\n        regions: provinces {\n            name\n            capital {\n                name\n                population @include(if: $detailed)\n            }\n            population @include(if: $detailed)\n            area\n        }\n    }\n}\n\nfragment cityData on City {\n    name\n    population\n    elevation\n    province {\n        name\n        population\n    }\n}",
+						"variables": "{\n    \"detailed\": true,\n    \"noCode\": false,\n    \"criteria\": {\n        \"country\": \"Spain\",\n        \"populationProvinceRange\": {\n            \"above\": 1000000,\n            \"below\": 3000000\n        }\n    }\n}"
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/graphql/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"graphql",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "countries",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query Countries($criteria: CountryCriteria) {\n    countries(criteria: $criteria) {\n        name\n        population\n        area\n        capital {\n            ...cityData\n        }\n        provinces {\n            name\n            population\n        }\n    }\n}\n\nfragment cityData on City {\n    name\n    population\n    elevation\n    province {\n        name\n        population\n    }\n}",
+						"variables": "{\n    \"criteria\": {\n        \"continent\": \"Europe\",\n        \"populationCountryRange\": {\n            \"above\":  5000000,\n            \"below\": 50000000\n        },\n        \"populationProvinceRange\": {\n            \"above\": 100000,\n            \"below\": 2000000\n        }\n    }\n}"
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/graphql/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"graphql",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "places",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query Places {\n    places(criteria: { name: \"Barb*\" }) {\n        __typename\n        name\n        population\n    }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/graphql/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"graphql",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "introspection",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query introspection {\n    __schema {\n        description\n        types {\n            name\n            kind\n            description\n            fields {\n                ...fieldData\n            }\n            interfaces {\n                name\n                kind\n            }\n            enumValues {\n                ...enumData\n            }\n        }\n    }\n}\n\nfragment fieldData on __Field {\n    name\n    description\n    args {\n        name\n        description\n        type {\n            kind\n            name\n        }\n        defaultValue\n    }\n    type {\n        ...fieldTypeData\n    }\n    isDeprecated\n    deprecationReason\n}\n\nfragment fieldTypeData on __Type {\n    name\n    kind\n    ofType {\n        name\n        kind\n        ofType {\n            name\n            kind\n        }\n    }\n}\n\nfragment enumData on __EnumValue {\n    name\n    description\n    isDeprecated\n    deprecationReason\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/graphql/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"graphql",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "introspection assignment",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query introspectionPlace {\n    __type(name: \"Place\") {\n        name\n        kind\n        fields(includeDeprecated: true) {\n            name\n            description\n            type {\n                ...unwrapType\n            }\n        }\n        ofType {\n            name\n            description\n            __typename\n        }\n        possibleTypes {\n            name\n            __typename \n        }\n    }\n}\n\nfragment unwrapType on __Type {\n    name\n    ofType {\n        name\n        ofType {\n            name\n        }\n    }\n}\n\n#query solution {\n#  __type(name:\"Place\") {\n#    name\n#    possibleTypes {\n#      name\n#      fields {\n#        name\n#        type {\n#          kind\n#          name\n#          ofType {\n#            kind\n#            name\n#            ofType {\n#            \tkind\n#              name\n#            }\n#          }\n#        }\n#      }\n#    }\n#  }\n#}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/graphql/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"graphql",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deprecate longitude and latitude",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query Countries($criteria: CountryCriteria) {\n    countries(criteria: $criteria) {\n        name\n        population\n        area\n        capital {\n            name\n            population\n            #latitude\n            #longitude\n            geoLocation {\n                latitude\n                longitude\n            }\n        }\n    }\n}",
+						"variables": "{\n    \"criteria\": {\n        \"continent\": \"Europe\",\n        \"populationCountryRange\": {\n            \"above\": 10000000,\n            \"below\": 20000000\n        }\n    }\n}"
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/graphql/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"graphql",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "assignment instrumentation",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "{ \n    provinces(criteria:{country: \"Switzerland\"}) {\n        name\n        population\n        capital {\n            name\n            population\n            province {\n                name\n            }\n        }\n    }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/graphql/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"graphql",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
