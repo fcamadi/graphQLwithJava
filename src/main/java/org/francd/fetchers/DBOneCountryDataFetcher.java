@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Objects;
 
 public class DBOneCountryDataFetcher implements DataFetcher<Country>  {
 
@@ -24,7 +25,9 @@ public class DBOneCountryDataFetcher implements DataFetcher<Country>  {
     public Country get(DataFetchingEnvironment environment) throws Exception {
 
         Map<String, Object> criteria = environment.getArgument("criteria");
-
+        if (Objects.isNull(criteria)) {
+            throw new RuntimeException("Criteria cannot be null");
+        }
         try (var statement = queryWithCriteria(criteria)) {
             ResultSet result = statement.executeQuery();
             if (result.next()) {

@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class DBCountriesDataFetcher implements DataFetcher<List<Country>>  {
 
@@ -31,7 +32,9 @@ public class DBCountriesDataFetcher implements DataFetcher<List<Country>>  {
     public List<Country> get(DataFetchingEnvironment environment) throws Exception {
 
         Map<String, Object> criteria = environment.getArgument("criteria");
-
+        if (Objects.isNull(criteria)) {
+            throw new RuntimeException("Criteria cannot be null");
+        }
         try (var statement = queryWithCriteria(criteria)) {
             ResultSet results = statement.executeQuery();
             List<Country> mappedResults = new ArrayList<>();
