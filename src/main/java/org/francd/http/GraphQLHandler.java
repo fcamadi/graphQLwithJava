@@ -10,7 +10,10 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.util.Callback;
+import org.francd.AsyncGraphQLRuntime;
 import org.francd.GraphQLRuntime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -20,12 +23,19 @@ import java.util.stream.Collectors;
 
 public class GraphQLHandler extends Handler.Abstract {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(GraphQLHandler.class);
+
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private final GraphQLRuntime graphQLRuntime;
+    private GraphQLRuntime graphQLRuntime;
+    private AsyncGraphQLRuntime asyncGraphQLRuntime;
 
     public GraphQLHandler(GraphQLRuntime graphQLRuntime) {
         this.graphQLRuntime = graphQLRuntime;
+    }
+
+    public GraphQLHandler(AsyncGraphQLRuntime asyncGraphQLRuntime) {
+        this.asyncGraphQLRuntime = asyncGraphQLRuntime;
     }
 
     @Override
@@ -33,7 +43,22 @@ public class GraphQLHandler extends Handler.Abstract {
         GraphQLRequest graphQLRequest = graphqlRequestFromHttp(httpRequest);
         String permissionsStr = Optional.ofNullable(httpRequest.getHeaders().get("X-Permissions")).orElse("");
         var permissions = Arrays.stream(permissionsStr.split(",")).map(String::trim).collect(Collectors.toSet());
-        ExecutionResult executionResult = graphQLRuntime.execute(graphQLRequest.query(), graphQLRequest.variables(), graphQLRequest.operationName(), permissions);
+
+        ExecutionResult executionResult = null;
+        if (graphQLRuntime != null) {
+            LOGGER.info("--- START Execution standard query ---------------------------------------------------------");
+            executionResult = graphQLRuntime.execute(graphQLRequest.query(), graphQLRequest.variables(), graphQLRequest.operationName(), permissions);
+            LOGGER.info("--- END Execution standard query -----------------------------------------------------------");
+        }
+        if (asyncGraphQLRuntime != null) {
+            LOGGER.info("--- START Execution ASYNC query ------------------------------------------------------------");
+            executionResult = asyncGraphQLRuntime.execute(graphQLRequest.query(), graphQLRequest.variables(), graphQLRequest.operationName(), permissions);
+            LOGGER.info("--- END Execution ASYNC query --------------------------------------------------------------");
+        }
+        if (graphQLRuntime == null && asyncGraphQLRuntime == null) {
+            return false;
+        }
+
         Content.Sink.write(response, true, mapper.writeValueAsString(executionResult.toSpecification()), callback);
         return true;
     }

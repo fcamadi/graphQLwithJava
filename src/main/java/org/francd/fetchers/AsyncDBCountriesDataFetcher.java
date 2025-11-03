@@ -6,6 +6,8 @@ import org.francd.db.Mapping;
 import org.francd.db.StateArgumentCollector;
 import org.francd.model.Continent;
 import org.francd.model.Country;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,6 +20,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class AsyncDBCountriesDataFetcher implements DataFetcher<CompletableFuture<List<Country>>>  {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncDBCountriesDataFetcher.class);
+
         private final Connection dbConnection;
 
         public AsyncDBCountriesDataFetcher(Connection dbConnection) {
@@ -26,6 +30,8 @@ public class AsyncDBCountriesDataFetcher implements DataFetcher<CompletableFutur
 
         @Override
         public CompletableFuture<List<Country>> get(DataFetchingEnvironment environment) throws Exception {
+
+            LOGGER.info("Start get");
 
             Map<String, Object> criteria = environment.getArgument("criteria");
 
@@ -37,6 +43,7 @@ public class AsyncDBCountriesDataFetcher implements DataFetcher<CompletableFutur
                         Country country = Mapping.countryOf(results);
                         mappedResults.add(country);
                     }
+                    LOGGER.info("End get - mappedResults size {}", mappedResults.size());
                     return mappedResults;
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
@@ -52,7 +59,7 @@ public class AsyncDBCountriesDataFetcher implements DataFetcher<CompletableFutur
                 FROM country c, encompasses e
                 WHERE
                     c.code = e.country
-        """);
+            """);
 
             StateArgumentCollector collector = new StateArgumentCollector();
 

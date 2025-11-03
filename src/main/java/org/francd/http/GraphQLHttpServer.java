@@ -3,6 +3,7 @@ package org.francd.http;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.francd.AsyncGraphQLRuntime;
 import org.francd.GraphQLRuntime;
 
 import java.sql.Connection;
@@ -14,7 +15,7 @@ public class GraphQLHttpServer {
 
     public static void main(String[] args) throws Exception {
 
-        // Setup DB
+        // Set up the DB
         Connection dbConnection = DriverManager.getConnection(
                 "jdbc:postgresql://localhost:5432/mondial",
                 "postgres",
@@ -22,13 +23,15 @@ public class GraphQLHttpServer {
         );
 
         GraphQLRuntime graphQLRuntime = new GraphQLRuntime(dbConnection);
+        AsyncGraphQLRuntime asyncGraphQLRuntime = new AsyncGraphQLRuntime(dbConnection);
 
-        // Setup the HTTP server
+        // Set up the HTTP server
         Server server = new Server(HTTP_PORT);
 
         ContextHandlerCollection contextHandlerCollection = new ContextHandlerCollection();
         contextHandlerCollection.addHandler(new ContextHandler(new GraphiQLHandler(), "/"));
         contextHandlerCollection.addHandler(new ContextHandler(new GraphQLHandler(graphQLRuntime), "/graphql"));
+        contextHandlerCollection.addHandler(new ContextHandler(new GraphQLHandler(asyncGraphQLRuntime), "/graphql/async"));
         server.setHandler(contextHandlerCollection);
 
         // Start the HTTP server
