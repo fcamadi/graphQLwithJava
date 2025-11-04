@@ -74,9 +74,9 @@ public class GraphQLRuntime {
         }
 
         //But we add a "Province" programmatically
-        typeRegistry.add(TypeHelper.objectDefinitionOf(Province.class));
+        //typeRegistry.add(TypeHelper.objectDefinitionOf(Province.class));
         // We add also the City
-        typeRegistry.add(TypeHelper.objectDefinitionOf(City.class));
+        //typeRegistry.add(TypeHelper.objectDefinitionOf(City.class));
 
         return typeRegistry;
     }
