@@ -46,8 +46,6 @@ public class GraphQLRuntime {
         // The generator combines the type definitions with the wiring, producing a GraphQLSchema
         // that knows both the shape of the API and how to fetch data.
         GraphQLSchema schema = schemaGenerator.makeExecutableSchema(typeRegistry, wiring);
-        // This builds a GraphQL object that can later be called with execute(query)
-        // to run queries against the schema.
 
         // To add more than one instrumentation class:
         ChainedInstrumentation chainedInstrumentations = new ChainedInstrumentation(
@@ -55,6 +53,8 @@ public class GraphQLRuntime {
                 new DataFetcherCounterInstrumentation()
         );
 
+        // This builds a GraphQL object that can later be called with execute(query)
+        // to run queries against the schema.
         graphql = GraphQL.newGraphQL(schema)
                 //.instrumentation(new LoggingInstrumentation())
                 //.instrumentation(new AccessControlInstrumentation())
