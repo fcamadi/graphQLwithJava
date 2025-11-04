@@ -17,6 +17,14 @@ type Query {
     places(criteria: PlaceCriteria): [Place]
 }
 
+type Mutation {
+    """
+    Updates an existing Province identified by its name.
+    Returns the updated Province object.
+    """
+    updateProvince(input: ProvinceUpdate!): Province!
+}
+
 scalar Surface
 
 input IntRange {
@@ -97,3 +105,13 @@ type GeoCoord {
 }
 
 #union Place = Country | Province | City
+
+
+"""
+Only population and area can be modified for a province
+"""
+input ProvinceUpdate  {
+    name: String!
+    population: Int
+    area: Int
+}
