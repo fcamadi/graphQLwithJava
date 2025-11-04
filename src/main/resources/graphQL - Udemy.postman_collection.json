@@ -42,7 +42,7 @@
 					"mode": "graphql",
 					"graphql": {
 						"query": "query Countries($criteria: CountryCriteria) {\n    countries(criteria: $criteria) {\n        name\n        population\n        area\n        capital {\n            ...cityData\n        }\n        provinces {\n            name\n            population\n        }\n    }\n}\n\nfragment cityData on City {\n    name\n    population\n    elevation\n    province {\n        name\n        population\n    }\n}",
-						"variables": "{\n    \"criteria\": {\n        \"continent\": \"Europe\",\n        \"populationCountryRange\": {\n            \"above\":  5000000,\n            \"below\": 50000000\n        },\n        \"populationProvinceRange\": {\n            \"above\": 100000,\n            \"below\": 2000000\n        }\n    }\n}"
+						"variables": "{\n    \"criteria\": {\n        \"continent\": \"Europe\",\n        \"populationCountryRange\": {\n            \"above\":  5000000,\n            \"below\": 50000000\n        },\n        \"populationProvinceRange\": {\n            \"above\": 1000000,\n            \"below\": 2000000\n        }\n    }\n}"
 					}
 				},
 				"url": {
@@ -54,6 +54,34 @@
 					"port": "8080",
 					"path": [
 						"graphql",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "countries ASYNC",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query Countries($criteria: CountryCriteria) {\n    countries(criteria: $criteria) {\n        name\n        population\n        area\n        capital {\n            ...cityData\n        }\n        provinces {\n            name\n            population\n        }\n    }\n}\n\nfragment cityData on City {\n    name\n    population\n    elevation\n    province {\n        name\n        population\n    }\n}",
+						"variables": "{\n    \"criteria\": {\n        \"continent\": \"Europe\",\n        \"populationCountryRange\": {\n            \"above\":  5000000,\n            \"below\": 50000000\n        },\n        \"populationProvinceRange\": {\n            \"above\": 1000000,\n            \"below\": 2000000\n        }\n    }\n}"
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/graphql/async/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"graphql",
+						"async",
 						""
 					]
 				}
@@ -177,6 +205,33 @@
 					"mode": "graphql",
 					"graphql": {
 						"query": "{ \n    provinces(criteria:{country: \"Switzerland\"}) {\n        name\n        population\n        capital {\n            name\n            population\n            province {\n                name\n            }\n        }\n    }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/graphql/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"graphql",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Province",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation {\n  updateProvince(\n    input: { \n        name: \"AragÃ³n\",\n        population: 1351666,\n        area: 47722\n    }\n  ) {\n    name\n    population\n    area\n    capital { name }\n  }\n}",
 						"variables": ""
 					}
 				},
