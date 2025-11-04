@@ -117,16 +117,6 @@ public class GraphQLRuntime {
                                 //.dataFetcher("province", new DBProvinceFromCapitalDataFetcher(dbConnection))
                                 //.dataFetcher("province", new DBProvinceDataFetcher(dbConnection))
                                 .dataFetcher("province", new BatchProvinceDataFetcher())
-                        /* //wire old fields for backwards compatibility
-                        .dataFetcher("latitude", env -> {
-                            City city = env.getSource();
-                            return Optional.ofNullable(city).map(City::geoLocation).map(GeoCoord::latitude).orElse(null);
-                        })
-                        .dataFetcher("longitude", env -> {
-                            City city = env.getSource();
-                            return Optional.ofNullable(city).map(City::geoLocation).map(GeoCoord::longitude).orElse(null);
-                        })
-                        */
                 )
                 .build();
     }
