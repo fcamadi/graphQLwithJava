@@ -118,6 +118,11 @@ public class GraphQLRuntime {
                                 //.dataFetcher("province", new DBProvinceDataFetcher(dbConnection))
                                 .dataFetcher("province", new BatchProvinceDataFetcher())
                 )
+
+                // Wire mutations
+                .type("Mutation", builder -> builder
+                    .dataFetcher("updateProvince", new DBUpdateProvinceDataFetcher(dbConnection)))
+
                 .build();
     }
 
